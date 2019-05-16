@@ -2,14 +2,23 @@
 DEBUG		:= no
 
 PREFIX		?= /usr
-LIBDIR		?= lib
+LIBDIR		?= /usr/lib64
 
 # compiler/linker options
 CC		:= gcc
 CFLAGS		:= $(CFLAGS) -Wall -fPIC `pkg-config --cflags libxml-2.0` \
-	`pkg-config --cflags dbus-1`
+	`pkg-config --cflags dbus-1` \
+	`pkg-config --cflags udisks2` \
+	`pkg-config --cflags glib-2.0` \
+	`pkg-config --cflags gobject-2.0` \
+	`pkg-config --cflags gio-2.0`
+
 LIBS		:= `pkg-config --libs libxml-2.0` \
-	`pkg-config --libs dbus-1`
+	`pkg-config --libs dbus-1` \
+	`pkg-config --libs udisks2` \
+	`pkg-config --libs glib-2.0` \
+	`pkg-config --libs gobject-2.0` \
+	`pkg-config --libs gio-2.0`
 
 # common source files
 SRCS		:= src/conf.c \

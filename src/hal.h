@@ -26,6 +26,7 @@ int pusb_hal_get_bool_property(DBusConnection *dbus, const char *udi, const char
 char **pusb_hal_get_string_array_property(DBusConnection *dbus, const char *udi, const char *name, int *n_items);
 int pusb_hal_check_property(DBusConnection *dbus, const char *udi, const char *name, const char *value);
 char *pusb_hal_find_item(DBusConnection *dbus, ...);
+int pusb_hal_find_item_for_udisk2(DBusConnection *dbus,	...);
 void pusb_hal_free_string_array(char **str_array, int length);
 
 #endif /* !PUSB_HAL_H_ */

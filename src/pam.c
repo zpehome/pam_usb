@@ -65,8 +65,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags,
 		return (PAM_IGNORE);
 	}
 
-	log_info("pam_usb v%s\n", PUSB_VERSION);
-	log_info("Authentication request for user \"%s\" (%s)\n",
+	log_debug("pam_usb v%s\n", PUSB_VERSION);
+	log_debug("Authentication request for user \"%s\" (%s)\n",
 			user, service);
 
 	if (pam_get_item(pamh, PAM_TTY,
@@ -80,15 +80,15 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags,
 	}
 	if (!pusb_local_login(&opts, user))
 	{
-		log_error("Access denied.\n");
+		log_debug("Access denied.\n");
 		return (PAM_AUTH_ERR);
 	}
-	if (pusb_device_check(&opts, user))
+	if (pusb_device_check_for_udisks2(&opts, user))
 	{
-		log_info("Access granted.\n");
+		log_debug("Access granted.\n");
 		return (PAM_SUCCESS);
 	}
-	log_error("Access denied.\n");
+	log_debug("Access denied.\n");
 	return (PAM_AUTH_ERR);
 }
 

@@ -23,6 +23,7 @@
 #include "mem.h"
 #include "log.h"
 #include "hal.h"
+#include <udisks/udisks.h>
 
 DBusConnection *pusb_hal_dbus_connect(void)
 {
@@ -250,6 +251,67 @@ int pusb_hal_check_property(DBusConnection *dbus,
 	return (retval);
 }
 
+int find_value_by_key_for_udisk2 (const char *name, char *_value)
+{
+	static UDisksClient *client = NULL;
+	GError *error = NULL;
+  GList *objects;
+  GList *l;
+  GList *l_interface;
+  GList *interface_proxies;
+  int retval = 0;
+
+	client = udisks_client_new_sync (NULL, /* GCancellable */ &error);
+  objects = g_dbus_object_manager_get_objects (udisks_client_get_object_manager (client));
+  for (l = objects; l != NULL; l = l->next)
+  {
+    UDisksObject *object = UDISKS_OBJECT (l->data);
+    interface_proxies = g_dbus_object_get_interfaces (G_DBUS_OBJECT (object));
+    for (l_interface = interface_proxies; l_interface != NULL; l_interface = l_interface->next)
+    {
+      GDBusProxy *iproxy = G_DBUS_PROXY (l_interface->data);
+      gchar **cached_properties;
+      guint n;
+
+      //g_print ("iproxy:%s\n", g_dbus_proxy_get_interface_name (iproxy));
+      cached_properties = g_dbus_proxy_get_cached_property_names (iproxy);
+      for (n = 0; cached_properties != NULL && cached_properties[n] != NULL; n++)
+      {
+        GVariant *value;
+        gchar *value_str;
+        const gchar *property_name = cached_properties[n];
+        value = g_dbus_proxy_get_cached_property (iproxy, property_name);
+        if (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING))
+        {
+          value_str = g_variant_dup_string (value, NULL);
+          //g_print("name:%s value:%s\n", property_name, value_str);
+		  if ((g_strcmp0(property_name, name) == 0) && (g_strcmp0(value_str, _value) == 0))
+		  {
+			  retval = 1;
+		  }
+          g_free (value_str);
+        }
+        g_variant_unref (value);
+      }
+      g_strfreev (cached_properties);
+    }
+    g_list_foreach (interface_proxies, (GFunc) g_object_unref, NULL);
+    g_list_free (interface_proxies);
+  }
+  g_list_foreach (objects, (GFunc) g_object_unref, NULL);
+  g_list_free (objects);
+
+  return retval;
+}
+
+int pusb_hal_check_property_for_udisk2(DBusConnection *dbus, const char *name, char *value)
+{
+	int		retval;
+
+	retval = find_value_by_key_for_udisk2(name, value);
+	return (retval);
+}
+
 char **pusb_hal_find_all_items(DBusConnection *dbus, int *count)
 {
 	DBusError	error;
@@ -342,4 +404,32 @@ char *pusb_hal_find_item(DBusConnection *dbus,
 	}
 	pusb_hal_free_string_array(devices, n_devices);
 	return (udi);
+}
+
+int pusb_hal_find_item_for_udisk2(DBusConnection *dbus,
+		...)
+{
+	va_list	ap;
+
+	char	*key = NULL;
+	int		match = 1;
+
+	va_start(ap, dbus);
+	while ((key = va_arg(ap, char *)))
+	{
+		char	*value = NULL;
+
+		value = va_arg(ap, char *);
+		if (!value || *value == 0x0)
+			continue ;
+		if (!pusb_hal_check_property_for_udisk2(dbus, key, value))
+		{
+			match = 0;
+			break;
+		}
+	}
+
+	va_end(ap);
+
+	return match;
 }

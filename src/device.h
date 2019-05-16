@@ -19,5 +19,6 @@
 # define PUSB_DEVICE_H_
 
 int pusb_device_check(t_pusb_options *opts, const char *user);
+int pusb_device_check_for_udisks2(t_pusb_options *opts,	const char *user);
 
 #endif /* !PUSB_DEVICE_H_ */

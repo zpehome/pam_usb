@@ -28,24 +28,19 @@
 
 static int pusb_device_connected(t_pusb_options *opts, DBusConnection *dbus)
 {
-	char	*udi = NULL;
+	int retval = 0;
 
 	log_debug("Searching for \"%s\" in the hardware database...\n",
 			opts->device.name);
-	udi = pusb_hal_find_item(dbus,
-			"DriveSerial", opts->device.serial,
-			"DriveVendor", opts->device.vendor,
-			"DriveModel", opts->device.model,
+	retval = pusb_hal_find_item_for_udisk2(dbus,
+			"Serial", opts->device.serial,
+			"Vendor", opts->device.vendor,
+			"Model", opts->device.model,
+			"IdUUID", opts->device.volume_uuid,
 			NULL);
-	if (!udi)
-	{
-	  log_error("Device \"%s\" is not connected.\n",
-				opts->device.name);
-	  return (0);
-	}
-	xfree(udi);
-	log_info("Device \"%s\" is connected (good).\n", opts->device.name);
-	return (1);
+
+	log_debug("Device \"%s\" is connected (good).\n", opts->device.name);
+	return retval;
 }
 
 int pusb_device_check(t_pusb_options *opts,
@@ -77,4 +72,17 @@ int pusb_device_check(t_pusb_options *opts,
 
 	pusb_hal_dbus_disconnect(dbus);
 	return (retval);
+}
+
+int pusb_device_check_for_udisks2(t_pusb_options *opts,
+		const char *user)
+{
+	DBusConnection	*dbus = NULL;
+
+	if (!pusb_device_connected(opts, dbus))
+	{
+		return 0;
+	}
+
+	return 1;
 }

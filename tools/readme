@@ -1,0 +1,4 @@
+udisks2tool is a tool that reading the Udisks2 info by c.
+
+compile:
+gcc udisk2tool.c -o udisk2tool -I /usr/include/udisks2/ -I /usr/include/glib-2.0/ -I /usr/lib64/glib-2.0/include/ -lglib-2.0 -ludisks2 -ldbus-1 -lgobject-2.0 -lgio-2.0

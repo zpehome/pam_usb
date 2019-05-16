@@ -29,3 +29,8 @@ Getting Started
 * Read the [Getting Started Guide](https://wiki.github.com/aluzzardi/pam_usb/Getting-Started)
 * Have a look at the [Configuration File Reference](https://wiki.github.com/aluzzardi/pam_usb/Configuration)
 * Problem? See the [Troubleshooting Guide](https://wiki.github.com/aluzzardi/pam_usb/Troubleshooting)
+
+Adopt Udisks2
+---------------
+* `pamusb-conf`: adopt communcation with Udisks2 use python and add rm-device & rm-user
+* `udisks2tool`: add udisks2tool that binary tool programmed in c.

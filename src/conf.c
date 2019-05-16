@@ -111,7 +111,7 @@ static int pusb_conf_parse_device(t_pusb_options *opts, xmlDoc *doc)
 	if (!pusb_conf_device_get_property(opts, doc, "serial", opts->device.serial,
 				sizeof(opts->device.serial)))
 		return (0);
-	pusb_conf_device_get_property(opts, doc, "volume_uuid",
+	pusb_conf_device_get_property(opts, doc, "uuid",
 			opts->device.volume_uuid,
 			sizeof(opts->device.volume_uuid));
 	return (1);
@@ -173,7 +173,7 @@ int pusb_conf_parse(const char *file, t_pusb_options *opts,
 			sizeof(opts->device.name));
 	if (!retval || !pusb_conf_parse_device(opts, doc))
 	{
-		log_error("No device configured for user \"%s\".\n", user);
+		log_debug("No device configured for user \"%s\".\n", user);
 		xmlFreeDoc(doc);
 		xmlCleanupParser();
 		return (0);
